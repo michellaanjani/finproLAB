@@ -1,0 +1,335 @@
+//----------------------------------------------------------------------------------------------------
+//---------------------------------------PROGRAM ENGLISH COURSE---------------------------------------
+//----------------------------------------------------------------------------------------------------
+#include <stdio.h>
+#include <string.h>
+#define max 100
+//No. Registrasi,Nama Siswa,Jenis Kursus,Nilai Quiz,Nilai Tugas,Nilai Ujian,Nilai Akhir Kursus,Grade Akhir
+//Michella
+struct Siswa{
+	char id[5];
+	char nama[50];
+	char jenisKursus[15];
+	int quiz;
+	int tugas;
+	int ujian;
+	double mean;
+	char grade;
+}siswa[max];
+//Michella
+void swap(struct Siswa *s1,struct Siswa *s2){
+	struct Siswa temp;
+	temp = *s1;
+    *s1 = *s2;
+    *s2 = temp;
+}
+
+int jmlSiswa;
+//Michella
+void bacaFile(){
+	FILE *fp;
+	fp = fopen("DataSiswa.txt","r");
+
+	int i=0;
+	while(fscanf(fp,"%[^,],%[^,],%[^,],%d,%d,%d,%lf,%c\n", siswa[i].id,siswa[i].nama,siswa[i].jenisKursus,
+	&siswa[i].quiz,&siswa[i].tugas,&siswa[i].ujian,&siswa[i].mean,&siswa[i].grade) != EOF)i++;
+	fclose(fp);
+
+	jmlSiswa=i;
+}
+
+//display Michella
+void print(int i){
+	printf("No. Registrasi\t: %s\n", siswa[i].id);
+	printf("Nama Siswa\t: %s\n", siswa[i].nama);
+	printf("Jenis Kursus\t: %s\n", siswa[i].jenisKursus);
+	printf("Nilai Quiz\t: %d\n", siswa[i].quiz);
+	printf("Nilai Tugas\t: %d\n", siswa[i].tugas);
+	printf("Nilai Ujian\t: %d\n", siswa[i].ujian);
+	printf("Nilai Akhir\t: %.2lf\n", siswa[i].mean);
+	printf("Grade Akhir\t: %c\n\n", siswa[i].grade);	
+}
+//Michella
+void cariInisial(){
+	char inisial[16];
+
+	printf("Cari berdasarkan inisial nama : ");
+	scanf("%s",inisial);
+	int panjang = (int)strlen(inisial);
+
+	int ketemu=0;
+	if(inisial[0]>= 'a'&&inisial[0]<= 'z'){
+		inisial[0] = inisial[0] - 'a' + 'A'; 
+	}
+	for(int i=0;i<jmlSiswa;i++){
+		if (panjang == 1) {
+            if (siswa[i].nama[0] == inisial[0]) {
+                print(i);ketemu=1;
+            }
+        }
+        else{
+        	char temp[16];
+			if(strstr(siswa[i].nama,inisial)!=0)
+			{
+				print(i);ketemu=1;
+			}
+		}	
+	}
+	if(ketemu==0)printf("\nTidak ada siswa yang cocok dengan inisial %s!!!\n",inisial);
+	
+}
+//Michella
+int validateJenis(char jenis[]){
+	if (strstr("ascending", jenis) != NULL)return 0;
+	else if (strstr("descending", jenis) != NULL)return 1;
+	else return -1;
+}
+
+//Michella
+void sortGrade(){
+	struct Siswa temp;
+	char pilih[15];
+	printf("Sorting nilai secara ascending atau descending: ");
+	scanf("%s", pilih);
+	int valid = validateJenis(pilih);
+	if (valid==0){
+		for(int k=0; k<jmlSiswa;k++){
+			for(int i=0;i<jmlSiswa-1;i++){
+				if(siswa[i].mean>siswa[i+1].mean){
+					swap(&siswa[i],&siswa[i+1]);
+				}
+			}
+		}
+		for(int i=0;i<jmlSiswa;i++){
+		print(i);
+		}
+	}
+	else if (valid==1){
+		for(int k=0; k<jmlSiswa;k++){
+			for(int i=0;i<jmlSiswa-1;i++){
+				if(siswa[i].mean<siswa[i+1].mean){
+					swap(&siswa[i],&siswa[i+1]);
+				}
+			}
+		}
+		for(int i=0;i<jmlSiswa;i++){
+		print(i);
+		}
+	}
+	else {
+        // Tampilin pesan error kalo inputnya gk valid
+        printf("Invalid input, can't process the data!!!\n\n");
+    }
+	
+}
+
+//Michella
+void SortID() {
+    struct Siswa temp;
+    int ketemu = 0;
+    int id1, id2;
+    char pilihanSort[20];  
+    printf("\nPilih jenis sorting ascending atau descending: ");
+    scanf("%s", pilihanSort);
+    int valid = validateJenis(pilihanSort);
+    printf("\n");
+        for (int j = 0; j < jmlSiswa; j++) {
+            for (int k = 0; k < jmlSiswa - 1; k++) {
+                sscanf(siswa[k].id, "%d", &id1);
+                sscanf(siswa[k + 1].id, "%d", &id2);
+                if(valid==0){
+                	if (id1 > id2) {
+                    // Tuker posisi data
+                    swap(&siswa[k],&siswa[k+1]);
+                    ketemu = 1;  // Nandain kalo ada tukeran data	
+					}
+                }
+                else if (valid==1){
+                	if (id1 < id2) {
+                    // Tuker posisi data
+                    swap(&siswa[k],&siswa[k+1]);
+                    ketemu = 1;  // Nandain kalo ada tukeran data
+					}
+            	}
+            	else {
+        		// Tampilin pesan error kalo inputnya gk valid
+        			printf("Error!!! data tidak bisa diproses!!!\n\n");
+        			ketemu = 0;  // Nandain kalo gk ada tukeran data
+    			}
+        	}
+    	} 
+    // Kalo ada tukeran data, tampilin hasil sorting
+    if (ketemu != 0) {
+        for (int i = 0; i < jmlSiswa; i++) {
+            print(i);
+        }
+    }
+}
+//Angelyn
+char tentukanGrade(double nilaiAkhir) {
+	if(nilaiAkhir >= 85) {
+		return 'A';
+	}
+	else if(nilaiAkhir >= 70) {
+		return 'B';
+	}
+	else if(nilaiAkhir >= 60) {
+		return 'C';
+	}
+	else if(nilaiAkhir >= 50) {
+		return 'D';
+	}
+	else if(nilaiAkhir < 50) {
+		return 'E';
+	}
+}
+
+//Angelyn
+int validateID(char idbaru[]){
+	int ketemu=0;
+	for(int i=0; i<jmlSiswa; i++){
+		if(strcmp(siswa[i].id, idbaru)==0){
+			printf("ID ini sudah ada silahkan masukan ID lain!!!\n\n");ketemu=1;
+		}
+	}
+	if (ketemu==1)return -1;
+	else return 0;
+}
+
+//Angelyn 
+void tambahData(){
+	struct Siswa student;
+	FILE *fPtr = fopen("DataSiswa.txt", "a");
+	char lanjutLagi;
+	int valid;
+
+	do {
+		do{
+			printf("Masukkan nomor registrasi (ID) siswa: ");
+			scanf("%s", student.id);
+			valid=validateID(student.id);
+		}while(valid==-1);
+		
+		printf("Masukan nama siswa: ");
+		scanf(" %[^\n]", student.nama);
+		if(student.nama[0]>= 'a'&&student.nama[0]<= 'z'){
+		student.nama[0] = student.nama[0] - 'a' + 'A'; 
+		}
+
+		printf("Masukkan jenis kursus [Beginner/Intermediate/Advanced]: ");
+		scanf("%s", student.jenisKursus);
+		while(strcmp(student.jenisKursus,"Beginner")!=0 && strcmp(student.jenisKursus,"Intermediate")!=0 && strcmp(student.jenisKursus,"Advanced")!=0) {
+			printf("Masukkan jenis kursus yang benar.\n");
+			printf("Masukkan jenis kursus [Beginner/Intermediate/Advanced]: ");
+			scanf("%s", student.jenisKursus);
+		}
+
+		printf("Masukan nilai quiz: ");
+		scanf("%d", &student.quiz);
+
+		printf("Masukan nilai tugas: ");
+		scanf("%d", &student.tugas);
+
+		printf("Masukan nilai ujian: ");
+		scanf("%d", &student.ujian);
+
+		student.mean = (0.3 * student.quiz) + (0.3 * student.tugas) + (0.4 * student.ujian);
+		student.grade = tentukanGrade(student.mean);
+
+		fprintf(fPtr, "%s,%s,%s,%d,%d,%d,%.2lf,%c\n", student.id, student.nama, student.jenisKursus, student.quiz, student.tugas, student.ujian, student.mean, student.grade);
+		printf("Data berhasil ditambahkan ke DataSiswa.txt.\n");
+
+		printf("Masukkan data siswa lagi [Y/T]? ");
+		scanf(" %c", &lanjutLagi);
+	} while(lanjutLagi == 'Y' || lanjutLagi == 'y');
+
+	fclose(fPtr);
+}
+// Odelia
+void cariID(){
+	char tempID[5];
+	printf("No. Registrasi (ID) siswa yang ingin dicari : ");
+	scanf("%s", tempID);
+	printf("\n");
+	int ketemu=0;
+	for(int i=0;i<jmlSiswa;i++){
+		if(strcmp(tempID,siswa[i].id)==0){
+			print(i);
+			ketemu=1;break;
+		}
+	}
+	if(ketemu==0)printf("Data siswa dengan ID : %s tidak ditemukan\n", tempID);
+}
+
+// Fungsi untuk memfilter siswa berdasarkan jenis kursus - Odelia
+void filterByCourse(const char* targetkurs) {
+    for (int i = 0; i < jmlSiswa; i++) {
+        if (strcmp(siswa[i].jenisKursus, targetkurs) == 0) {
+            print(i);
+        }
+    }
+    printf("\n");
+}
+//Odelia
+void sortCourse(){
+	char kurs[15];
+	printf("Cari berdasarkan level course: ");
+	scanf("%s", kurs);
+	filterByCourse(kurs);
+}
+
+//Michella
+void awal1(){
+	printf("==================================================\n");
+	printf("------------- Program English Course -------------\n");
+	printf("==================================================\n\n");
+	printf("1. Tampilkan data siswa berdasarkan grade-nya\n");//michel
+	printf("2. Tambahkan data siswa baru\n");//angelyn
+	printf("3. Cari siswa dengan No. Registrasi\n");//odel
+	printf("4. Cari data dengan inisial nama siswa\n");//michel
+	printf("5. Sorting berdasarkan No. Registrasi\n");//michel
+	printf("6. Cari siswa berdasarkan level kursus\n");//Odel
+	printf("7. Exit\n\n");//michel
+}
+
+
+int main(){
+	int menu;
+	do{
+	awal1();
+	bacaFile();
+	printf("Pilih Menu: ");
+	if(scanf("%d",&menu)==0)
+	{
+		printf("invalid input\n");break;
+	}
+	//getchar();
+	switch(menu){
+		case 1:
+			sortGrade();
+			break;
+		case 2:
+			tambahData();
+			break;
+		case 3:
+			cariID();
+			break;
+		case 4:
+			cariInisial();
+			break;
+		case 5:
+			SortID();
+			break;
+		case 6:
+			sortCourse();
+			break;
+		default: 
+			{
+				if(menu!=7){
+				printf("invalid number\n");
+				}
+			}
+	}}while(menu!=7);
+	
+	return 0;
+}
